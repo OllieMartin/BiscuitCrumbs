@@ -22,7 +22,7 @@ public class Program {
 	 * Return the specified line of the program, starting at line 1
 	 */
 	public String getLine(int line) {
-		return lines.get(line + 1);
+		return lines.get(line);
 	}
 	
 	public int getLineCount() {

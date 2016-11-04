@@ -16,7 +16,11 @@ public class InputStream {
 	}
 	
 	public char peek() {
+		try {
 		return line.charAt(pointer + 1);
+		} catch (Exception e) {
+			return '$';
+		}
 	}
 	
 	public boolean eof() {
@@ -27,5 +31,9 @@ public class InputStream {
 			return false;
 		}
 		
+	}
+	
+	public int getPointer() {
+		return pointer;
 	}
 }

@@ -12,13 +12,15 @@ public class Lexer {
 	//
 	public static void main(String args[]) {
 		Program p = new Program();
-		p.addLine("int x;");
-		p.addLine("x = 3;");
+		p.addLine("int x; str y; chr z; z =  'A'; boo a = true;");
+		p.addLine("y = \"Hello World\"");
+		p.addLine("#This is a comment");
+		p.addLine("x = 3; #This is also a comment");
 		p.addLine("if x = 3 then {");
-		p.addLine("x = x + 1;");
+		p.addLine("		x = x + 1;");
 		p.addLine("}else{");
-		p.addLine("x = x - 1;");
-		p.addLine("}");
+		p.addLine("		x = x - 1;");
+		p.addLine("};");
 			
 		Lexer l = new Lexer(p);
 		ArrayList<Token> tokens = l.getTokenStream();
@@ -61,7 +63,7 @@ public class Lexer {
 	public ArrayList<Token> getTokenStream() {
 		pc = 0;
 		
-		while (pc + 1 < program.getLineCount()) {
+		while (pc + 1 <= program.getLineCount()) {
 			lex(program.getLine(pc));
 			pc ++;
 		}
@@ -95,6 +97,8 @@ public class Lexer {
 		
 		char ch = is.peek();
 		if (ch == '#') {
+			is.next();
+			skipComment(is);
 			return;
 		}
 		
@@ -120,28 +124,28 @@ public class Lexer {
 		
 		if (isPunct(ch)) {
 			Token t;
+			is.next();
 			switch (ch) {
 			case ';':
-				t = new Token("SEMICOLON", ";");
+				t = new Token("SEMICOLON", ";",pc+1,is.getPointer());
 				break;
 			case '{':
-				t = new Token("LBRACE", "{");
+				t = new Token("LBRACE", "{",pc+1,is.getPointer());
 				break;
 			case '}':
-				t = new Token("RBRACE", "}");
+				t = new Token("RBRACE", "}",pc+1,is.getPointer());
 				break;
 			case '(':
-				t = new Token("LPAREN", "(");
+				t = new Token("LPAREN", "(",pc+1,is.getPointer());
 				break;
 			case ')':
-				t = new Token("RPAREN", ")");
+				t = new Token("RPAREN", ")",pc+1,is.getPointer());
 				break;
 			default:
 				t = new Token("NULL","null");
 				break;
 			}
 			tokenStream.add(t);
-			is.next();
 			return;
 		}
 		
@@ -149,49 +153,49 @@ public class Lexer {
 			Token t;
 			switch (ch) {
 			case '+':
-				t = new Token("PLUS", "+");
 				is.next();
+				t = new Token("PLUS", "+",pc+1,is.getPointer());
 				break;
 			case '-':
-				t = new Token("MINUS", "-");
 				is.next();
+				t = new Token("MINUS", "-",pc+1,is.getPointer());
 				break;
 			case '/':
-				t = new Token("DIVIDE", "/");
 				is.next();
+				t = new Token("DIVIDE", "/",pc+1,is.getPointer());
 				break;
 			case '*':
-				t = new Token("MULTIPLY", "*");
 				is.next();
+				t = new Token("MULTIPLY", "*",pc+1,is.getPointer());
 				break;
 			case '=':
-				t = new Token("EQUALS", "=");
 				is.next();
+				t = new Token("EQUALS", "=",pc+1,is.getPointer());
 				break;
 			case '!':
 				is.next();
 				if (is.peek() == '=') {
-					t = new Token("NOTEQUALS", "!=");
+					t = new Token("NOTEQUALS", "!=",pc+1,is.getPointer());
 				} else {
-					t = new Token("NOT", "!");
+					t = new Token("NOT", "!",pc+1,is.getPointer());
 				}
 				is.next();
 				break;
 			case '<':
 				is.next();
 				if (is.peek() == '=') {
-					t = new Token("LESSTHANEQUAL", "<=");
+					t = new Token("LESSTHANEQUAL", "<=",pc+1,is.getPointer());
 				} else {
-					t = new Token("LESSTHAN", "<");
+					t = new Token("LESSTHAN", "<",pc+1,is.getPointer());
 				}
 				is.next();
 				break;
 			case '>':
 				is.next();
 				if (is.peek() == '=') {
-					t = new Token("GREATERTHANEQUAL", ">=");
+					t = new Token("GREATERTHANEQUAL", ">=",pc+1,is.getPointer());
 				} else {
-					t = new Token("GREATERTHAN", ">");
+					t = new Token("GREATERTHAN", ">",pc+1,is.getPointer());
 				}
 				is.next();
 				break;
@@ -207,6 +211,14 @@ public class Lexer {
 		
 	}
 	
+	protected void skipComment(InputStream is) {
+		
+		
+		while (is.peek() != '\n' && !is.eof()) {
+			is.next();
+		}
+		
+	}
 	protected void skipWhiteSpace(InputStream is) {
 		
 		if (!is.eof()) {
@@ -264,7 +276,7 @@ public class Lexer {
 		
 		is.next();
 		
-		Token t = new Token("CHAR",newString);
+		Token t = new Token("CHAR",newString,pc+1,is.getPointer()-1);
 		tokenStream.add(t);
 		
 		return;
@@ -282,7 +294,7 @@ public class Lexer {
 		
 		is.next();
 		
-		Token t = new Token("STRING",newString);
+		Token t = new Token("STRING",newString,pc+1,is.getPointer() - newString.length());
 		tokenStream.add(t);
 		
 		return;
@@ -296,7 +308,7 @@ public class Lexer {
 			newString = newString + is.next();
 		}
 		
-		Token t = new Token("NUMBER",newString);
+		Token t = new Token("NUMBER",newString,pc+1,is.getPointer() - newString.length());
 		tokenStream.add(t);
 		
 		return;
@@ -313,9 +325,13 @@ public class Lexer {
 		Token t;
 		
 		if (keyWords.contains(newString)) {
-			t = new Token(newString.toUpperCase(),newString);
+			t = new Token(newString.toUpperCase(),newString,pc+1,is.getPointer() - newString.length());
+		} else if (newString.equals("true")){
+			t = new Token("TRUE",newString,pc+1,is.getPointer() - newString.length());
+		} else if (newString.equals("false")){
+			t = new Token("FALSE",newString,pc+1,is.getPointer() - newString.length());
 		} else {
-			t = new Token("VAR",newString);
+			t = new Token("VAR",newString,pc+1,is.getPointer() - newString.length());
 		}
 		
 		tokenStream.add(t);
