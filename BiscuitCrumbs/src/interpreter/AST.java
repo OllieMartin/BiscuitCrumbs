@@ -4,12 +4,30 @@ import java.util.ArrayList;
 
 public class AST extends Object {
 
+	public ArrayList<AST> getInitialValue() {
+		return initialValue;
+	}
+
+	public void setInitialValue(ArrayList<AST> initialValue) {
+		this.initialValue = initialValue;
+	}
+
+	public AST getVariable() {
+		return variable;
+	}
+
+	public void setVariable(AST variable) {
+		this.variable = variable;
+	}
+
 	protected String type;
 	protected String value;
 	protected ArrayList<AST> thenDo;
 	protected ArrayList<AST> elseDo;
 	protected ArrayList<AST> whileDo;
 	protected ArrayList<AST> doWhile;
+	protected ArrayList<AST> initialValue;
+	protected AST variable;
 	public String getType() {
 		return type;
 	}

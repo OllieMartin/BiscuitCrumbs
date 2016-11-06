@@ -28,4 +28,12 @@ public class Token {
 		return value;
 	}
 	
+	public int getLine() {
+		return lineNumber;
+	}
+	
+	public int getCol() {
+		return colIndex;
+	}
+	
 }

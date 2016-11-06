@@ -12,6 +12,7 @@ public class Lexer {
 	//
 	public static void main(String args[]) {
 		Program p = new Program();
+		p.addLine("x = \"Hello There\"; #This is also a comment");
 		p.addLine("int x; str y; chr z; z =  'A'; boo a = true;");
 		p.addLine("y = \"Hello World\"");
 		p.addLine("#This is a comment");
@@ -27,13 +28,13 @@ public class Lexer {
 		
 		TokenStream ts = new TokenStream(tokens);
 		
-		Parser parser = new Parser();
-		@SuppressWarnings("unused")
-		ArrayList<AST> parseResult = parser.parse(ts);
-		
 		for (Token t : tokens) {
 			System.out.println(t.getType() + " : " + t.getValue());
 		}
+		
+		Parser parser = new Parser();
+		@SuppressWarnings("unused")
+		ArrayList<AST> parseResult = parser.parse(ts);
 		
 		}
 	//
