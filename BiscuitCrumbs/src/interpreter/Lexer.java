@@ -25,10 +25,11 @@ public class Lexer {
 		Lexer l = new Lexer(p);
 		ArrayList<Token> tokens = l.getTokenStream();
 		
-		@SuppressWarnings("unused")
 		TokenStream ts = new TokenStream(tokens);
 		
-		//Time to parse!
+		Parser parser = new Parser();
+		@SuppressWarnings("unused")
+		ArrayList<AST> parseResult = parser.parse(ts);
 		
 		for (Token t : tokens) {
 			System.out.println(t.getType() + " : " + t.getValue());
