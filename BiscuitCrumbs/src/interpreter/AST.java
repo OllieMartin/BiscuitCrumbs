@@ -76,11 +76,11 @@ public class AST extends Object {
 		this.doWhile = doWhile;
 	}
 
-	public ArrayList<AST> getCondition() {
+	public AST getCondition() {
 		return condition;
 	}
 
-	public void setCondition(ArrayList<AST> condition) {
+	public void setCondition(AST condition) {
 		this.condition = condition;
 	}
 
@@ -108,7 +108,7 @@ public class AST extends Object {
 		this.right = right;
 	}
 
-	protected ArrayList<AST> condition;
+	protected AST condition;
 	protected AST operator;
 	protected ArrayList<AST> left;
 	protected ArrayList<AST> right;

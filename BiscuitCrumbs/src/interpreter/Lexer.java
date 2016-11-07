@@ -14,7 +14,7 @@ public class Lexer {
 		Program p = new Program();
 		p.addLine("x = \"Hello There\"; #This is also a comment");
 		p.addLine("int x; str y; chr z; z =  'A'; boo a = true;");
-		p.addLine("y = \"Hello World\"");
+		p.addLine("y = \"Hello World\";");
 		p.addLine("#This is a comment");
 		p.addLine("x = 3; #This is also a comment");
 		p.addLine("if x = 3 then {");
@@ -33,11 +33,57 @@ public class Lexer {
 		}
 		
 		Parser parser = new Parser();
-		@SuppressWarnings("unused")
 		ArrayList<AST> parseResult = parser.parse(ts);
+		
+		System.out.println("#");
+		
+		displayASTArray(parseResult);
+		
+		Executor e = new Executor(parseResult);
+		e.execute();
 		
 		}
 	//
+	
+	public static void displayASTArray(ArrayList<AST> astarr) {
+		for (AST a : astarr) {
+			if (a.getType().equals("IF")) {
+				System.out.println("IF");
+				displayASTArray(a.getCondition().getLeft());
+				System.out.println(a.getCondition().getOperator().getValue());
+				displayASTArray(a.getCondition().getRight());
+				displayASTArray(a.getThenDo());
+				if (a.getElseDo() != null) {
+					System.out.println("ELSE");
+					displayASTArray(a.getElseDo());
+				}
+			}
+			else if (a.getType().equals("WHILE")) {
+				System.out.println("WHILE");
+				displayASTArray(a.getWhileDo());
+			}
+			else if (a.getType().equals("ASSIGNMENT")) {
+				System.out.println("ASSIGN");
+				displayASTArray(a.getLeft());
+				System.out.println(a.getOperator().getValue());
+				displayASTArray(a.getRight());
+			}
+			else if (a.getType().equals("EXPRESSION")) {
+				displayASTArray(a.getLeft());
+				System.out.println(a.getOperator().getValue());
+				displayASTArray(a.getRight());
+			}
+			else if (a.getType().equals("INT") || a.getType().equals("STR") || a.getType().equals("CHR") || a.getType().equals("BOO")) {
+				System.out.println(a.getType());
+				System.out.println(a.getVariable().getValue());
+				if (a.getInitialValue() != null)
+				displayASTArray(a.getInitialValue());
+			} else {
+				System.out.println(a.getValue());
+			}
+			
+		}
+	}
 	
 	public Lexer(Program p) {
 		

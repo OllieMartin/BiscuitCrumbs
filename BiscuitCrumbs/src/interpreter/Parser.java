@@ -8,6 +8,10 @@ public class Parser {
 	}
 	
 	public ArrayList<AST> parse(TokenStream ts) {
+		return parse(ts,false);
+	}
+	
+	public ArrayList<AST> parse(TokenStream ts, boolean parseSelection) {
 		
 		try {
 		
@@ -28,9 +32,9 @@ public class Parser {
 			} else if (t.getType().equals("INT") || t.getType().equals("STR") || t.getType().equals("CHR") || t.getType().equals("BOO")) {
 				prog.add(parseDeclaration(ts));
 			} else if (t.getType().equals("IF")) {
-				
+				prog.add(parseIf(ts));
 			} else if (t.getType().equals("WHILE")) {
-				
+				prog.add(parseWhile(ts));
 			} else if (t.getType().equals("DO")) {
 				
 			} else if (t.getType().equals("COUT")) {
@@ -38,6 +42,17 @@ public class Parser {
 			} else if (t.getType().equals("CIN")) {
 				
 			} else if (t.getType().equals("SEMICOLON")) {
+				ts.next();
+			} else if (t.getType().equals("LBRACE")) {
+				ts.next();
+			} else if (t.getType().equals("RBRACE")) {
+				if (!parseSelection) {
+					ts.next();
+				} else {
+					ts.next();
+					return prog;
+				}
+			} else {
 				ts.next();
 			}
 			
@@ -84,20 +99,23 @@ public class Parser {
 		
 		while (ts.hasNext()) {
 			t = ts.peek();
-			if (t.getType().equals("SEMICOLON") || t.getType().equals("THEN") || t.getType().equals("DO")) {
+			if (t.getType().equals("SEMICOLON") || t.getType().equals("THEN") || t.getType().equals("DO") ) {
 				if (lastType.equals("NULL")) {
 					throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
 				} else {
 					return expression;
 				}
+			} else if (t.getType().equals("EQUALS")) {
+				return expression;
 			}
-			if (!(lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && (t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
+			if (!(lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && (t.getType().equals("VAR") || t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
 				throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
 			}
-			if ((lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && !(t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
+			if ((lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && !(t.getType().equals("VAR") || t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
 				throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
 			}
 			lastType = t.getType();
+			ast = new AST();
 			ast.setValue(t.getValue());
 			ast.setType(t.getType());
 			expression.add(ast);
@@ -128,6 +146,94 @@ public class Parser {
 			return declaration;
 		} else {
 			return declaration;
+		}
+	}
+
+	protected AST parseIf(TokenStream ts) throws InvalidSyntaxException {
+		AST ifast = new AST();
+		
+		Token t = ts.next();
+		
+		ifast.setType(t.getType());
+		ifast.setValue(t.getValue());
+		
+		if(ts.hasNext()) {
+			ifast.setCondition(parseCondition(ts));
+		}
+		
+		if(ts.hasNext()) {
+			ts.next();
+			if(ts.hasNext()) {
+				ifast.setThenDo(parse(ts,true));
+			} else {
+				throw new InvalidSyntaxException("Invalid IF Statement", t.getLine(), t.getCol());
+			}
+		} else {
+			throw new InvalidSyntaxException("Invalid IF Statement", t.getLine(), t.getCol());
+		}
+		
+		if (ts.hasNext()) {
+			if (ts.peek().getType().equals("ELSE")) {
+				ts.next();
+				ifast.setElseDo(parse(ts,true));
+			} else {
+				ifast.setElseDo(null);
+			}
+		}
+		
+		return ifast;
+	}
+
+	protected AST parseWhile(TokenStream ts) throws InvalidSyntaxException {
+		AST whileast = new AST();
+		
+		Token t = ts.next();
+		
+		whileast.setType(t.getType());
+		whileast.setValue(t.getValue());
+		
+		if(ts.hasNext()) {
+			whileast.setCondition(parseCondition(ts));
+		}
+		
+		if(ts.hasNext()) {
+			ts.next();
+			if(ts.hasNext()) {
+				whileast.setWhileDo(parse(ts,true));
+			} else {
+				throw new InvalidSyntaxException("Invalid WHILE Statement", t.getLine(), t.getCol());
+			}
+		} else {
+			throw new InvalidSyntaxException("Invalid WHILE Statement", t.getLine(), t.getCol());
+		}
+		
+		return whileast;
+	}
+	
+	protected AST parseCondition(TokenStream ts) throws InvalidSyntaxException {
+		AST cond = new AST();
+		
+		Token t = ts.peek();
+		cond.setType("CONDITION");
+		if (!ts.hasNext()) {
+			throw new InvalidSyntaxException("Invalid Condition", t.getLine(), t.getCol());
+		}
+		cond.left = parseExpression(ts);
+		t = ts.next();
+		AST operator = new AST();
+		operator.setValue(t.getValue());
+		operator.setType(t.getType());
+		cond.setOperator(operator);
+		if (ts.hasNext()) {
+			cond.right = parseExpression(ts);
+			if (ts.hasNext()) {
+				ts.next();
+			} else {
+				throw new InvalidSyntaxException("Invalid Condition", t.getLine(), t.getCol());
+			}
+			return cond;
+		} else {
+			throw new InvalidSyntaxException("Invalid Condition", t.getLine(), t.getCol());
 		}
 	}
 }
