@@ -12,11 +12,10 @@ public class Lexer {
 	//
 	public static void main(String args[]) {
 		Program p = new Program();
-		p.addLine("x = \"Hello There\"; #This is also a comment");
-		p.addLine("int x; str y; chr z; z =  'A'; boo a = true;");
+		p.addLine("int x = 2 + 2 * 6; int q = x + 3; str y; chr z; z =  'A'; boo a = true;");
 		p.addLine("y = \"Hello World\";");
 		p.addLine("#This is a comment");
-		p.addLine("x = 3; #This is also a comment");
+		p.addLine("x = (3+4)*2; #This is also a comment");
 		p.addLine("if x = 3 then {");
 		p.addLine("		x = x + 1;");
 		p.addLine("}else{");
@@ -40,7 +39,13 @@ public class Lexer {
 		displayASTArray(parseResult);
 		
 		Executor e = new Executor();
-		e.execute(parseResult);
+		try {
+			e.execute(parseResult);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			System.out.println("Error executing code");
+			e1.printStackTrace();
+		}
 		
 		}
 	//

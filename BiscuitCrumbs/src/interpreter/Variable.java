@@ -18,18 +18,22 @@ public class Variable {
 
 	public Variable(String identifier, int value) {
 		type = varType.integer;
+		intvalue = value;
 	}
 	
 	public Variable(String identifier, char value) {
 		type = varType.character;
+		charvalue = value;
 	}
 	
 	public Variable(String identifier, String value) {
 		type = varType.string;
+		stringvalue = value;
 	}
 	
 	public Variable(String identifier, boolean value) {
 		type = varType.bool;
+		boolvalue = value;
 	}
 	
 	public int getIntValue() {

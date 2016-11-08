@@ -23,11 +23,6 @@ public class Parser {
 			
 			if ( t.getType().equals("VAR") ) {
 				prog.add(parseAssignment(ts));
-				
-				System.out.println(prog.get(0).getType());
-				System.out.println(prog.get(0).getLeft().get(0).getValue());
-				System.out.println(prog.get(0).getOperator().getValue());
-				System.out.println(prog.get(0).getRight().get(0).getValue());
 			
 			} else if (t.getType().equals("INT") || t.getType().equals("STR") || t.getType().equals("CHR") || t.getType().equals("BOO")) {
 				prog.add(parseDeclaration(ts));
@@ -99,6 +94,7 @@ public class Parser {
 		
 		while (ts.hasNext()) {
 			t = ts.peek();
+			
 			if (t.getType().equals("SEMICOLON") || t.getType().equals("THEN") || t.getType().equals("DO") ) {
 				if (lastType.equals("NULL")) {
 					throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
@@ -111,10 +107,13 @@ public class Parser {
 			if (!(lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && (t.getType().equals("VAR") || t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
 				throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
 			}
-			if ((lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && !(t.getType().equals("VAR") || t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
+			if ((lastType.equals("NULL") || lastType.equals("PLUS") || lastType.equals("MINUS") || lastType.equals("DIVIDE") || lastType.equals("MULTIPLY")) && !(t.getType().equals("RPAREN") ||t.getType().equals("LPAREN") ||t.getType().equals("VAR") || t.getType().equals("NUMBER") || t.getType().equals("CHAR") || t.getType().equals("STRING") || t.getType().equals("TRUE") || t.getType().equals("FALSE"))) {
 				throw new InvalidSyntaxException("Expression Parsing", t.getLine(), t.getCol());
 			}
-			lastType = t.getType();
+			if (!(t.getType().equals("LPAREN") || t.getType().equals("RPAREN")))
+				lastType = t.getType();
+			else 
+				System.out.println();
 			ast = new AST();
 			ast.setValue(t.getValue());
 			ast.setType(t.getType());
