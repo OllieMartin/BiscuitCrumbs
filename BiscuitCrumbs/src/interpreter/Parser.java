@@ -33,7 +33,7 @@ public class Parser {
 			} else if (t.getType().equals("DO")) {
 				
 			} else if (t.getType().equals("COUT")) {
-				
+				prog.add(parseCout(ts));
 			} else if (t.getType().equals("CIN")) {
 				
 			} else if (t.getType().equals("SEMICOLON")) {
@@ -84,6 +84,27 @@ public class Parser {
 			assignment.setRight(parseExpression(ts));
 		}
 		return assignment;
+	}
+	
+	protected AST parseCout(TokenStream ts) throws InvalidSyntaxException {
+		Token t = ts.next();
+		AST cout = new AST();
+		cout.setType("COUT");
+
+		if (ts.hasNext()) {
+			if (ts.peek().getType().equals("STRING")) {
+				ArrayList<AST> string = new ArrayList<AST>();
+				AST stringast = new AST();
+				stringast.setType("STRING");
+				stringast.setValue(ts.peek().getValue());
+				string.add(stringast);
+				cout.setRight(string);
+			} else {
+				cout.setRight(parseExpression(ts));
+			}	
+			ts.next();
+		}
+		return cout;
 	}
 	
 	protected ArrayList<AST> parseExpression(TokenStream ts) throws InvalidSyntaxException {

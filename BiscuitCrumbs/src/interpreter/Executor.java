@@ -43,7 +43,7 @@ public class Executor {
 	    }
 
 	    finalvalue = stack.pop();
-	    System.out.println("FINALVALUE: " + finalvalue);
+	    //System.out.println("FINALVALUE: " + finalvalue);
 		
 		return finalvalue;
 		
@@ -52,8 +52,7 @@ public class Executor {
 	public void execute(ArrayList<AST> tree) throws Exception {
 		int pc = 0;
 		
-		while (pc <= tree.size()) {
-			
+		while (pc <= tree.size() - 1) {
 			if (tree.get(pc).getType().equals("INT")) {
 				if (tree.get(pc).getInitialValue() != null) {
 					varList.put(tree.get(pc).getVariable().getValue(), new Variable(tree.get(pc).getVariable().getValue(),evaluateInt(tree.get(pc).getInitialValue())));
@@ -104,13 +103,43 @@ public class Executor {
 					default:
 						break;
 					}
-				} else {
-					throw new Exception();
 				}
 				pc++;
+			} else if (tree.get(pc).getType().equals("IF")) {
+					if (tree.get(pc).getCondition().getLeft().get(0).getType().equals("NUMBER") || (tree.get(pc).getCondition().getLeft().get(0).getType().equals("VAR") && varList.get(tree.get(pc).getCondition().getLeft().get(0).getValue()) != null)) {
+						int leftside = evaluateInt(tree.get(pc).getCondition().getLeft());
+						int rightside = evaluateInt(tree.get(pc).getCondition().getRight());
+						
+						if (tree.get(pc).getCondition().getOperator().getType().equals("EQUALS")) {
+							if (leftside == rightside) {
+								System.out.println("TEST");
+								execute(tree.get(pc).getThenDo());
+							} else {
+								if (tree.get(pc).getElseDo() != null) {
+									execute(tree.get(pc).getElseDo());
+								}
+							}
+						}
+						
+					}
+					
+					pc++;
+			}else if (tree.get(pc).getType().equals("COUT")) {
+				if(tree.get(pc).getRight().get(0).getType().equals("STRING")) {
+					System.out.println("CONSOLE OUTPUT > " + tree.get(pc).getRight().get(0).getValue());
+				} else {
+					int rightside = evaluateInt(tree.get(pc).getRight());
+					System.out.println("CONSOLE OUTPUT > " + rightside);
+				}
+				
+				pc++;
+				} else {
+					//
+					pc++;
+				}
+			//pc++;
 			
 		}
 		
-	}
 	}
 }

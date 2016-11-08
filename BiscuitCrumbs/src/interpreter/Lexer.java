@@ -16,11 +16,12 @@ public class Lexer {
 		p.addLine("y = \"Hello World\";");
 		p.addLine("#This is a comment");
 		p.addLine("x = (3+4)*2; #This is also a comment");
-		p.addLine("if x = 3 then {");
+		p.addLine("x=3;");
+		p.addLine("if x = 3 + 1 then {");
 		p.addLine("		x = x + 1;");
 		p.addLine("}else{");
 		p.addLine("		x = x - 1;");
-		p.addLine("};");
+		p.addLine("}; cout x; cout \"Hi there\";");
 			
 		Lexer l = new Lexer(p);
 		ArrayList<Token> tokens = l.getTokenStream();
