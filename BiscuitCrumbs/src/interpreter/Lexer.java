@@ -39,8 +39,8 @@ public class Lexer {
 		
 		displayASTArray(parseResult);
 		
-		Executor e = new Executor(parseResult);
-		e.execute();
+		Executor e = new Executor();
+		e.execute(parseResult);
 		
 		}
 	//

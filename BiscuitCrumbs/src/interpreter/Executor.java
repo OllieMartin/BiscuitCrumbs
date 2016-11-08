@@ -1,17 +1,18 @@
 package interpreter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Executor {
 	
+	protected HashMap<String,Variable> varList = new HashMap<String,Variable>();
+	
 	ArrayList<AST> tree;
 
-	public Executor(ArrayList<AST> programTree) {
-		tree = programTree;
-	}
+	public Executor() {}
 	
-	public void execute() {
-		
+	public void execute(ArrayList<AST> programTree) {
+		tree = programTree;
 	}
 	
 }
